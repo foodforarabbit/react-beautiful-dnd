@@ -4,7 +4,7 @@ import { type Node } from 'react';
 import memoizeOne from 'memoize-one';
 import { connect } from 'react-redux';
 import Draggable from './draggable';
-import { storeKey } from '../context-keys';
+import { storeContext } from '../context-keys';
 import { negate, origin } from '../../state/position';
 import isStrictEqual from '../is-strict-equal';
 import getDisplacementMap, {
@@ -249,7 +249,7 @@ const ConnectedDraggable: OwnProps => Node = (connect(
     // Using our own store key.
     // This allows consumers to also use redux
     // Note: the default store key is 'store'
-    storeKey,
+    context: storeContext,
     // Default value, but being really clear
     pure: true,
     // When pure, compares the result of mapStateToProps to its previous value.

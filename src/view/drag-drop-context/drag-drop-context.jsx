@@ -21,7 +21,6 @@ import type {
 import type { DraggableId, State, Hooks } from '../../types';
 import type { Store } from '../../state/store-types';
 import {
-  storeKey,
   dimensionMarshalKey,
   styleContextKey,
   canLiftContextKey,
@@ -118,11 +117,6 @@ export default class DragDropContext extends React.Component<Props> {
   // Need to declare childContextTypes without flow
   // https://github.com/brigand/babel-plugin-flow-react-proptypes/issues/22
   static childContextTypes = {
-    [storeKey]: PropTypes.shape({
-      dispatch: PropTypes.func.isRequired,
-      subscribe: PropTypes.func.isRequired,
-      getState: PropTypes.func.isRequired,
-    }).isRequired,
     [dimensionMarshalKey]: PropTypes.object.isRequired,
     [styleContextKey]: PropTypes.string.isRequired,
     [canLiftContextKey]: PropTypes.func.isRequired,
@@ -130,7 +124,6 @@ export default class DragDropContext extends React.Component<Props> {
 
   getChildContext(): Context {
     return {
-      [storeKey]: this.store,
       [dimensionMarshalKey]: this.dimensionMarshal,
       [styleContextKey]: this.styleMarshal.styleContext,
       [canLiftContextKey]: this.canLift,

@@ -7,7 +7,7 @@ import { Provider, connect } from 'react-redux';
 import { createStore } from 'redux';
 import { Droppable, Draggable, DragDropContext } from '../../../../src';
 import type { DraggableProvided, DroppableProvided } from '../../../../src';
-import { storeKey, canLiftContextKey } from '../../../../src/view/context-keys';
+import { storeContext, canLiftContextKey } from '../../../../src/view/context-keys';
 import App from './app';
 // Imported as wildcard so we can mock `resetStyleContext` using spyOn
 
@@ -25,12 +25,6 @@ it('should put a store on the context', () => {
     throw new Error('Invalid test setup');
   }
 
-  expect(app.context[storeKey]).toHaveProperty('dispatch');
-  expect(app.context[storeKey].dispatch).toBeInstanceOf(Function);
-  expect(app.context[storeKey]).toHaveProperty('getState');
-  expect(app.context[storeKey].getState).toBeInstanceOf(Function);
-  expect(app.context[storeKey]).toHaveProperty('subscribe');
-  expect(app.context[storeKey].subscribe).toBeInstanceOf(Function);
 });
 
 describe('can start drag', () => {
@@ -78,7 +72,7 @@ describe('Playing with other redux apps', () => {
     class Container extends Component<*> {
       render() {
         return (
-          <Provider store={store}>
+          <Provider store={store} context={storeContext}>
             <DragDropContext onDragEnd={() => {}}>
               <Droppable droppableId="droppable">
                 {(droppableProvided: DroppableProvided) => (

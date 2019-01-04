@@ -4,7 +4,7 @@
 import type { Dispatch, Store } from "redux";
 
 declare module "react-redux" {
-  import type { ComponentType, ElementConfig } from 'react';
+  import type { ComponentType, ElementConfig, Context } from 'react';
 
   declare export class Provider<S, A> extends React$Component<{
     store: Store<S, A>,
@@ -12,7 +12,6 @@ declare module "react-redux" {
   }> {}
 
   declare export function createProvider(
-    storeKey?: string,
     subKey?: string
   ): Provider<*, *>;
 
@@ -49,7 +48,7 @@ declare module "react-redux" {
     areOwnPropsEqual?: (next: OP, prev: OP) => boolean,
     areStatePropsEqual?: (next: RSP, prev: RSP) => boolean,
     areMergedPropsEqual?: (next: RMP, prev: RMP) => boolean,
-    storeKey?: string
+    context?: Context
   |};
 
   declare type OmitDispatch<Component> = $Diff<Component, {dispatch: Dispatch<*>}>;
