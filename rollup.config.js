@@ -48,11 +48,16 @@ export default [
       globals: { react: 'React' },
     },
     // Only deep dependency required is React
-    external: ['react'],
+    external: ['react', 'react-redux'],
     plugins: [
       babel(getBabelOptions({ useESModules: true })),
       resolve({ extensions }),
-      commonjs({ include: 'node_modules/**' }),
+      commonjs({
+        include: 'node_modules/**',
+        namedExports: {
+          'node_modules/react-is/index.js': ['isValidElementType']
+        }
+      }),
       replace({ 'process.env.NODE_ENV': JSON.stringify('development') }),
       sizeSnapshot(snapshotArgs),
     ],
@@ -67,11 +72,16 @@ export default [
       globals: { react: 'React' },
     },
     // Only deep dependency required is React
-    external: ['react'],
+    external: ['react', 'react-redux'],
     plugins: [
       babel(getBabelOptions({ useESModules: true })),
       resolve({ extensions }),
-      commonjs({ include: 'node_modules/**' }),
+      commonjs({
+        include: 'node_modules/**',
+        namedExports: {
+          'node_modules/react-is/index.js': ['isValidElementType']
+        }
+      }),
       strip({ debugger: true }),
       replace({ 'process.env.NODE_ENV': JSON.stringify('production') }),
       sizeSnapshot(snapshotArgs),
