@@ -4,6 +4,8 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
 
+var React = require('react');
+var React__default = _interopDefault(React);
 var _extends = _interopDefault(require('@babel/runtime/helpers/extends'));
 var invariant = _interopDefault(require('tiny-invariant'));
 var cssBoxModel = require('css-box-model');
@@ -12,12 +14,21 @@ var memoizeOne = _interopDefault(require('memoize-one'));
 var redux = require('redux');
 var _Object$assign = _interopDefault(require('@babel/runtime/core-js/object/assign'));
 var rafSchd = _interopDefault(require('raf-schd'));
-var React = require('react');
-var React__default = _interopDefault(React);
 var _inheritsLoose = _interopDefault(require('@babel/runtime/helpers/inheritsLoose'));
 var PropTypes = _interopDefault(require('prop-types'));
 var reactRedux = require('react-redux');
 var reactMotion = require('react-motion');
+
+var prefix = function prefix(key) {
+  return "private-react-beautiful-dnd-key-do-not-use-" + key;
+};
+
+var storeContext = React__default.createContext(undefined);
+var droppableIdKey = prefix('droppable-id');
+var droppableTypeKey = prefix('droppable-type');
+var dimensionMarshalKey = prefix('dimension-marshal');
+var styleContextKey = prefix('style-context');
+var canLiftContextKey = prefix('can-lift');
 
 var vertical = {
   direction: 'vertical',
@@ -3126,10 +3137,10 @@ var css = {
   outOfTheWay: 'transform 0.2s cubic-bezier(0.2, 0, 0, 1)'
 };
 
-var prefix = 'data-react-beautiful-dnd';
-var dragHandle = prefix + "-drag-handle";
-var draggable = prefix + "-draggable";
-var droppable = prefix + "-droppable";
+var prefix$1 = 'data-react-beautiful-dnd';
+var dragHandle = prefix$1 + "-drag-handle";
+var draggable = prefix$1 + "-draggable";
+var droppable = prefix$1 + "-droppable";
 
 var getStyles = (function (styleContext) {
   var dragHandleSelector = "[" + dragHandle + "=\"" + styleContext + "\"]";
@@ -3188,7 +3199,7 @@ var createStyleMarshal = (function () {
     !!el ? process.env.NODE_ENV !== "production" ? invariant(false, 'Style marshal already mounted') : invariant(false) : void 0;
     el = document.createElement('style');
     el.type = 'text/css';
-    el.setAttribute(prefix, context);
+    el.setAttribute(prefix$1, context);
     getHead().appendChild(el);
     setStyle(styles.resting);
   };
@@ -3776,17 +3787,6 @@ var createAutoScroller = (function (_ref) {
   };
   return marshal;
 });
-
-var prefix$1 = function prefix(key) {
-  return "private-react-beautiful-dnd-key-do-not-use-" + key;
-};
-
-var storeContext = React__default.createContext(undefined);
-var droppableIdKey = prefix$1('droppable-id');
-var droppableTypeKey = prefix$1('droppable-type');
-var dimensionMarshalKey = prefix$1('dimension-marshal');
-var styleContextKey = prefix$1('style-context');
-var canLiftContextKey = prefix$1('can-lift');
 
 var _DragDropContext$chil;
 var resetServerContext = function resetServerContext() {
@@ -6438,6 +6438,7 @@ ConnectedDraggable.defaultProps = {
   disableInteractiveElementBlocking: false
 };
 
+exports.storeContext = storeContext;
 exports.DragDropContext = DragDropContext;
 exports.Droppable = connectedDroppable;
 exports.Draggable = ConnectedDraggable;

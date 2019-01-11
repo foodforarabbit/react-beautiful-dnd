@@ -1,3 +1,4 @@
+import React, { Component, PureComponent, Fragment } from 'react';
 import _extends from '@babel/runtime/helpers/es6/extends';
 import invariant from 'tiny-invariant';
 import { getRect, getBox, withScroll, createBox, calculateBox } from 'css-box-model';
@@ -6,11 +7,21 @@ import memoizeOne from 'memoize-one';
 import { applyMiddleware, createStore, compose, bindActionCreators } from 'redux';
 import _Object$assign from '@babel/runtime/core-js/object/assign';
 import rafSchd from 'raf-schd';
-import React, { Component, PureComponent, Fragment } from 'react';
 import _inheritsLoose from '@babel/runtime/helpers/es6/inheritsLoose';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Motion, spring } from 'react-motion';
+
+var prefix = function prefix(key) {
+  return "private-react-beautiful-dnd-key-do-not-use-" + key;
+};
+
+var storeContext = React.createContext(undefined);
+var droppableIdKey = prefix('droppable-id');
+var droppableTypeKey = prefix('droppable-type');
+var dimensionMarshalKey = prefix('dimension-marshal');
+var styleContextKey = prefix('style-context');
+var canLiftContextKey = prefix('can-lift');
 
 var vertical = {
   direction: 'vertical',
@@ -3119,10 +3130,10 @@ var css = {
   outOfTheWay: 'transform 0.2s cubic-bezier(0.2, 0, 0, 1)'
 };
 
-var prefix = 'data-react-beautiful-dnd';
-var dragHandle = prefix + "-drag-handle";
-var draggable = prefix + "-draggable";
-var droppable = prefix + "-droppable";
+var prefix$1 = 'data-react-beautiful-dnd';
+var dragHandle = prefix$1 + "-drag-handle";
+var draggable = prefix$1 + "-draggable";
+var droppable = prefix$1 + "-droppable";
 
 var getStyles = (function (styleContext) {
   var dragHandleSelector = "[" + dragHandle + "=\"" + styleContext + "\"]";
@@ -3181,7 +3192,7 @@ var createStyleMarshal = (function () {
     !!el ? process.env.NODE_ENV !== "production" ? invariant(false, 'Style marshal already mounted') : invariant(false) : void 0;
     el = document.createElement('style');
     el.type = 'text/css';
-    el.setAttribute(prefix, context);
+    el.setAttribute(prefix$1, context);
     getHead().appendChild(el);
     setStyle(styles.resting);
   };
@@ -3769,17 +3780,6 @@ var createAutoScroller = (function (_ref) {
   };
   return marshal;
 });
-
-var prefix$1 = function prefix(key) {
-  return "private-react-beautiful-dnd-key-do-not-use-" + key;
-};
-
-var storeContext = React.createContext(undefined);
-var droppableIdKey = prefix$1('droppable-id');
-var droppableTypeKey = prefix$1('droppable-type');
-var dimensionMarshalKey = prefix$1('dimension-marshal');
-var styleContextKey = prefix$1('style-context');
-var canLiftContextKey = prefix$1('can-lift');
 
 var _DragDropContext$chil;
 var resetServerContext = function resetServerContext() {
@@ -6431,4 +6431,4 @@ ConnectedDraggable.defaultProps = {
   disableInteractiveElementBlocking: false
 };
 
-export { DragDropContext, connectedDroppable as Droppable, ConnectedDraggable as Draggable, resetServerContext };
+export { storeContext, DragDropContext, connectedDroppable as Droppable, ConnectedDraggable as Draggable, resetServerContext };
