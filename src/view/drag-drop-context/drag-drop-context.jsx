@@ -22,7 +22,7 @@ import type { DraggableId, State, Hooks } from '../../types';
 import type { Store } from '../../state/store-types';
 import { Provider } from 'react-redux';
 import {
-  storeContextKey,
+  storeContext,
   dimensionMarshalKey,
   styleContextKey,
   canLiftContextKey,
@@ -71,12 +71,9 @@ export default class DragDropContext extends React.Component<Props> {
   autoScroller: AutoScroller;
   announcer: Announcer;
   unsubscribe: Function;
-  storeContext: React.Context<any>;
 
   constructor(props: Props, context: mixed) {
     super(props, context);
-
-    this.storeContext = React.createContext(undefined);
 
     this.announcer = createAnnouncer();
 
@@ -122,7 +119,6 @@ export default class DragDropContext extends React.Component<Props> {
   // Need to declare childContextTypes without flow
   // https://github.com/brigand/babel-plugin-flow-react-proptypes/issues/22
   static childContextTypes = {
-    [storeContextKey]: PropTypes.object,
     [dimensionMarshalKey]: PropTypes.object.isRequired,
     [styleContextKey]: PropTypes.string.isRequired,
     [canLiftContextKey]: PropTypes.func.isRequired,
@@ -130,7 +126,6 @@ export default class DragDropContext extends React.Component<Props> {
 
   getChildContext(): Context {
     return {
-      [storeContextKey]: this.storeContext,
       [dimensionMarshalKey]: this.dimensionMarshal,
       [styleContextKey]: this.styleMarshal.styleContext,
       [canLiftContextKey]: this.canLift,
@@ -191,7 +186,7 @@ export default class DragDropContext extends React.Component<Props> {
   render() {
     return <Provider
       store={this.store}
-      context={this.storeContext}
+      context={storeContext}
     >
       {this.props.children}
     </Provider>;

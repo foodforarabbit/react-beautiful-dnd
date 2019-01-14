@@ -1,9 +1,8 @@
 // @flow
-import React, { type Node, Component } from 'react';
+import { type Node } from 'react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 import memoizeOne from 'memoize-one';
-import { storeContextKey } from '../context-keys';
+import { storeContext } from '../context-keys';
 import Droppable from './droppable';
 import isStrictEqual from '../is-strict-equal';
 import type {
@@ -120,57 +119,35 @@ export const makeMapStateToProps = (): Selector => {
   return selector;
 };
 
-export default class Droppable2 extends Component {
-  /* eslint-disable react/sort-comp */
-  storeContext: React.Context<any>;
+// Leaning heavily on the default shallow equality checking
+// that `connect` provides.
+// It avoids needing to do it own within `Droppable`
+const connectedDroppable: OwnProps => Node = (connect(
+  // returning a function so each component can do its own memoization
+  makeMapStateToProps,
+  // mapDispatchToProps - not using
+  null,
+  // mergeProps - using default
+  null,
+  {
+    // Using our own store key.
+    // This allows consumers to also use redux
+    // Note: the default store key is 'store'
+    context: storeContext,
+    // Default value, but being really clear
+    pure: true,
+    // When pure, compares the result of mapStateToProps to its previous value.
+    // Default value: shallowEqual
+    // Switching to a strictEqual as we return a memoized object on changes
+    areStatePropsEqual: isStrictEqual,
+  },
+): any)(Droppable);
 
-  // Need to declare contextTypes without flow
-  // https://github.com/brigand/babel-plugin-flow-react-proptypes/issues/22
-  static contextTypes = {
-    [storeContextKey]: PropTypes.object,
-  };
-
-  constructor(props: Props, context: Object) {
-    super(props, context);
-    this.storeContext = context[storeContextKey];
-  }
-
-  render() {
-
-    // Leaning heavily on the default shallow equality checking
-    // that `connect` provides.
-    // It avoids needing to do it own within `Droppable`
-    const ConnectedDroppable: OwnProps => Node = (connect(
-      // returning a function so each component can do its own memoization
-      makeMapStateToProps,
-      // mapDispatchToProps - not using
-      null,
-      // mergeProps - using default
-      null,
-      {
-        // Using our own store key.
-        // This allows consumers to also use redux
-        // Note: the default store key is 'store'
-        context: this.storeContext,
-        // Default value, but being really clear
-        pure: true,
-        // When pure, compares the result of mapStateToProps to its previous value.
-        // Default value: shallowEqual
-        // Switching to a strictEqual as we return a memoized object on changes
-        areStatePropsEqual: isStrictEqual,
-      },
-    ): any)(Droppable);
-    return (
-      <ConnectedDroppable
-        {...this.props}
-      />
-    );
-  }
-}
-
-Droppable2.defaultProps = ({
+connectedDroppable.defaultProps = ({
   type: 'DEFAULT',
   isDropDisabled: false,
   direction: 'vertical',
   ignoreContainerClipping: false,
 }: DefaultProps);
+
+export default connectedDroppable;

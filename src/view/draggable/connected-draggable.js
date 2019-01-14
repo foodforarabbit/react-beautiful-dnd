@@ -1,11 +1,10 @@
 // @flow
 import { type Position } from 'css-box-model';
-import React, { type Node, Component } from 'react';
-import PropTypes from 'prop-types';
+import { type Node } from 'react';
 import memoizeOne from 'memoize-one';
 import { connect } from 'react-redux';
 import Draggable from './draggable';
-import { storeContextKey } from '../context-keys';
+import { storeContext } from '../context-keys';
 import { negate, origin } from '../../state/position';
 import isStrictEqual from '../is-strict-equal';
 import getDisplacementMap, {
@@ -236,57 +235,34 @@ const mapDispatchToProps: DispatchProps = {
   dropAnimationFinished: dropAnimationFinishedAction,
 };
 
-export default class Draggable2 extends Component {
-  /* eslint-disable react/sort-comp */
-  storeContext: React.Context<any>;
+// Leaning heavily on the default shallow equality checking
+// that `connect` provides.
+// It avoids needing to do it own within `Draggable`
+const ConnectedDraggable: OwnProps => Node = (connect(
+  // returning a function so each component can do its own memoization
+  makeMapStateToProps,
+  (mapDispatchToProps: any),
+  // mergeProps: use default
+  null,
+  // options
+  {
+    // Using our own store key.
+    // This allows consumers to also use redux
+    // Note: the default store key is 'store'
+    context: storeContext,
+    // Default value, but being really clear
+    pure: true,
+    // When pure, compares the result of mapStateToProps to its previous value.
+    // Default value: shallowEqual
+    // Switching to a strictEqual as we return a memoized object on changes
+    areStatePropsEqual: isStrictEqual,
+  },
+): any)(Draggable);
 
-  // Need to declare contextTypes without flow
-  // https://github.com/brigand/babel-plugin-flow-react-proptypes/issues/22
-  static contextTypes = {
-    [storeContextKey]: PropTypes.object,
-  };
-
-  constructor(props: Props, context: Object) {
-    super(props, context);
-    this.storeContext = context[storeContextKey];
-  }
-
-  render() {
-
-
-    // Leaning heavily on the default shallow equality checking
-    // that `connect` provides.
-    // It avoids needing to do it own within `Draggable`
-    const ConnectedDraggable: OwnProps => Node = (connect(
-      // returning a function so each component can do its own memoization
-      makeMapStateToProps,
-      (mapDispatchToProps: any),
-      // mergeProps: use default
-      null,
-      // options
-      {
-        // Using our own store key.
-        // This allows consumers to also use redux
-        // Note: the default store key is 'store'
-        context: this.storeContext,
-        // Default value, but being really clear
-        pure: true,
-        // When pure, compares the result of mapStateToProps to its previous value.
-        // Default value: shallowEqual
-        // Switching to a strictEqual as we return a memoized object on changes
-        areStatePropsEqual: isStrictEqual,
-      },
-    ): any)(Draggable);
-    return (
-      <ConnectedDraggable
-        {...this.props}
-      />
-    );
-  }
-}
-
-Draggable2.defaultProps = ({
+ConnectedDraggable.defaultProps = ({
   isDragDisabled: false,
   // cannot drag interactive elements by default
   disableInteractiveElementBlocking: false,
 }: DefaultProps);
+
+export default ConnectedDraggable;

@@ -10,7 +10,7 @@
     return "private-react-beautiful-dnd-key-do-not-use-" + key;
   };
 
-  var storeContextKey = prefix('store-context');
+  var storeContext = React__default.createContext(undefined);
   var droppableIdKey = prefix('droppable-id');
   var droppableTypeKey = prefix('droppable-type');
   var dimensionMarshalKey = prefix('dimension-marshal');
@@ -5845,7 +5845,6 @@
       _this.autoScroller = void 0;
       _this.announcer = void 0;
       _this.unsubscribe = void 0;
-      _this.storeContext = void 0;
 
       _this.canLift = function (id) {
         return canStartDrag(_this.store.getState(), id);
@@ -5865,7 +5864,6 @@
         return _this.onFatalError(error);
       };
 
-      _this.storeContext = React__default.createContext(undefined);
       _this.announcer = createAnnouncer();
       _this.styleMarshal = createStyleMarshal();
       _this.store = createStore$1({
@@ -5906,7 +5904,7 @@
     _proto.getChildContext = function getChildContext() {
       var _ref;
 
-      return _ref = {}, _ref[storeContextKey] = this.storeContext, _ref[dimensionMarshalKey] = this.dimensionMarshal, _ref[styleContextKey] = this.styleMarshal.styleContext, _ref[canLiftContextKey] = this.canLift, _ref;
+      return _ref = {}, _ref[dimensionMarshalKey] = this.dimensionMarshal, _ref[styleContextKey] = this.styleMarshal.styleContext, _ref[canLiftContextKey] = this.canLift, _ref;
     };
 
     _proto.componentDidMount = function componentDidMount() {
@@ -5941,14 +5939,14 @@
     _proto.render = function render() {
       return React__default.createElement(reactRedux.Provider, {
         store: this.store,
-        context: this.storeContext
+        context: storeContext
       }, this.props.children);
     };
 
     return DragDropContext;
   }(React__default.Component);
 
-  DragDropContext.childContextTypes = (_DragDropContext$chil = {}, _DragDropContext$chil[storeContextKey] = propTypes.object, _DragDropContext$chil[dimensionMarshalKey] = propTypes.object.isRequired, _DragDropContext$chil[styleContextKey] = propTypes.string.isRequired, _DragDropContext$chil[canLiftContextKey] = propTypes.func.isRequired, _DragDropContext$chil);
+  DragDropContext.childContextTypes = (_DragDropContext$chil = {}, _DragDropContext$chil[dimensionMarshalKey] = propTypes.object.isRequired, _DragDropContext$chil[styleContextKey] = propTypes.string.isRequired, _DragDropContext$chil[canLiftContextKey] = propTypes.func.isRequired, _DragDropContext$chil);
 
   var isScrollable = function isScrollable() {
     for (var _len = arguments.length, values = new Array(_len), _key = 0; _key < _len; _key++) {
@@ -6422,7 +6420,6 @@
     return a === b;
   });
 
-  var _Droppable2$contextTy;
   var makeMapStateToProps = function makeMapStateToProps() {
     var getIsDraggingOver = function getIsDraggingOver(id, destination) {
       if (!destination) {
@@ -6490,35 +6487,12 @@
 
     return selector;
   };
-
-  var Droppable2 = function (_Component) {
-    _inheritsLoose(Droppable2, _Component);
-
-    function Droppable2(props, context) {
-      var _this;
-
-      _this = _Component.call(this, props, context) || this;
-      _this.storeContext = void 0;
-      _this.storeContext = context[storeContextKey];
-      return _this;
-    }
-
-    var _proto = Droppable2.prototype;
-
-    _proto.render = function render() {
-      var ConnectedDroppable = reactRedux.connect(makeMapStateToProps, null, null, {
-        context: this.storeContext,
-        pure: true,
-        areStatePropsEqual: isStrictEqual
-      })(Droppable);
-      return React__default.createElement(ConnectedDroppable, this.props);
-    };
-
-    return Droppable2;
-  }(React.Component);
-
-  Droppable2.contextTypes = (_Droppable2$contextTy = {}, _Droppable2$contextTy[storeContextKey] = propTypes.object, _Droppable2$contextTy);
-  Droppable2.defaultProps = {
+  var connectedDroppable = reactRedux.connect(makeMapStateToProps, null, null, {
+    context: storeContext,
+    pure: true,
+    areStatePropsEqual: isStrictEqual
+  })(Droppable);
+  connectedDroppable.defaultProps = {
     type: 'DEFAULT',
     isDropDisabled: false,
     direction: 'vertical',
@@ -9894,7 +9868,6 @@
 
   Draggable.contextTypes = (_Draggable$contextTyp = {}, _Draggable$contextTyp[droppableIdKey] = propTypes.string.isRequired, _Draggable$contextTyp[droppableTypeKey] = propTypes.string.isRequired, _Draggable$contextTyp[styleContextKey] = propTypes.string.isRequired, _Draggable$contextTyp);
 
-  var _Draggable2$contextTy;
   var defaultMapProps = {
     isDropAnimating: false,
     isDragging: false,
@@ -10035,43 +10008,20 @@
     drop: drop,
     dropAnimationFinished: dropAnimationFinished
   };
-
-  var Draggable2 = function (_Component) {
-    _inheritsLoose(Draggable2, _Component);
-
-    function Draggable2(props, context) {
-      var _this;
-
-      _this = _Component.call(this, props, context) || this;
-      _this.storeContext = void 0;
-      _this.storeContext = context[storeContextKey];
-      return _this;
-    }
-
-    var _proto = Draggable2.prototype;
-
-    _proto.render = function render() {
-      var ConnectedDraggable = reactRedux.connect(makeMapStateToProps$1, mapDispatchToProps, null, {
-        context: this.storeContext,
-        pure: true,
-        areStatePropsEqual: isStrictEqual
-      })(Draggable);
-      return React__default.createElement(ConnectedDraggable, this.props);
-    };
-
-    return Draggable2;
-  }(React.Component);
-
-  Draggable2.contextTypes = (_Draggable2$contextTy = {}, _Draggable2$contextTy[storeContextKey] = propTypes.object, _Draggable2$contextTy);
-  Draggable2.defaultProps = {
+  var ConnectedDraggable = reactRedux.connect(makeMapStateToProps$1, mapDispatchToProps, null, {
+    context: storeContext,
+    pure: true,
+    areStatePropsEqual: isStrictEqual
+  })(Draggable);
+  ConnectedDraggable.defaultProps = {
     isDragDisabled: false,
     disableInteractiveElementBlocking: false
   };
 
-  exports.storeContextKey = storeContextKey;
+  exports.storeContext = storeContext;
   exports.DragDropContext = DragDropContext;
-  exports.Droppable = Droppable2;
-  exports.Draggable = Draggable2;
+  exports.Droppable = connectedDroppable;
+  exports.Draggable = ConnectedDraggable;
   exports.resetServerContext = resetServerContext;
 
   Object.defineProperty(exports, '__esModule', { value: true });
