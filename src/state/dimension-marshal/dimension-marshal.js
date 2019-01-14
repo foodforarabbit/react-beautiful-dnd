@@ -123,10 +123,10 @@ export default (callbacks: Callbacks) => {
       return;
     }
 
-    invariant(
-      collection.critical.draggable.id !== descriptor.id,
-      'Cannot remove the dragging item during a drag',
-    );
+    // invariant(
+    //   collection.critical.draggable.id !== descriptor.id,
+    //   'Cannot remove the dragging item during a drag',
+    // );
 
     // Not relevant to the drag
     if (descriptor.type !== collection.critical.draggable.type) {
@@ -216,10 +216,10 @@ export default (callbacks: Callbacks) => {
       return;
     }
 
-    invariant(
-      collection.critical.droppable.id !== descriptor.id,
-      'Cannot remove the home Droppable during a drag',
-    );
+    // invariant(
+    //   collection.critical.droppable.id !== descriptor.id,
+    //   'Cannot remove the home Droppable during a drag',
+    // );
 
     // Not relevant to the drag
     if (collection.critical.droppable.type !== descriptor.type) {

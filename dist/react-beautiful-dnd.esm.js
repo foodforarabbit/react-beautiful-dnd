@@ -9,14 +9,14 @@ import _Object$assign from '@babel/runtime/core-js/object/assign';
 import rafSchd from 'raf-schd';
 import _inheritsLoose from '@babel/runtime/helpers/es6/inheritsLoose';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import { Provider, connect } from 'react-redux';
 import { Motion, spring } from 'react-motion';
 
 var prefix = function prefix(key) {
   return "private-react-beautiful-dnd-key-do-not-use-" + key;
 };
 
-var storeContext = React.createContext(undefined);
+var storeContextKey = prefix('store-context');
 var droppableIdKey = prefix('droppable-id');
 var droppableTypeKey = prefix('droppable-type');
 var dimensionMarshalKey = prefix('dimension-marshal');
@@ -2914,8 +2914,6 @@ var createDimensionMarshal = (function (callbacks) {
       return;
     }
 
-    !(collection.critical.draggable.id !== descriptor.id) ? process.env.NODE_ENV !== "production" ? invariant(false, 'Cannot remove the dragging item during a drag') : invariant(false) : void 0;
-
     if (descriptor.type !== collection.critical.draggable.type) {
       return;
     }
@@ -2968,8 +2966,6 @@ var createDimensionMarshal = (function (callbacks) {
     if (!collection) {
       return;
     }
-
-    !(collection.critical.droppable.id !== descriptor.id) ? process.env.NODE_ENV !== "production" ? invariant(false, 'Cannot remove the home Droppable during a drag') : invariant(false) : void 0;
 
     if (collection.critical.droppable.type !== descriptor.type) {
       return;
@@ -3808,6 +3804,7 @@ var DragDropContext = function (_React$Component) {
     _this.autoScroller = void 0;
     _this.announcer = void 0;
     _this.unsubscribe = void 0;
+    _this.storeContext = void 0;
 
     _this.canLift = function (id) {
       return canStartDrag(_this.store.getState(), id);
@@ -3827,6 +3824,7 @@ var DragDropContext = function (_React$Component) {
       return _this.onFatalError(error);
     };
 
+    _this.storeContext = React.createContext(undefined);
     _this.announcer = createAnnouncer();
     _this.styleMarshal = createStyleMarshal();
     _this.store = createStore$1({
@@ -3867,7 +3865,7 @@ var DragDropContext = function (_React$Component) {
   _proto.getChildContext = function getChildContext() {
     var _ref;
 
-    return _ref = {}, _ref[dimensionMarshalKey] = this.dimensionMarshal, _ref[styleContextKey] = this.styleMarshal.styleContext, _ref[canLiftContextKey] = this.canLift, _ref;
+    return _ref = {}, _ref[storeContextKey] = this.storeContext, _ref[dimensionMarshalKey] = this.dimensionMarshal, _ref[styleContextKey] = this.styleMarshal.styleContext, _ref[canLiftContextKey] = this.canLift, _ref;
   };
 
   _proto.componentDidMount = function componentDidMount() {
@@ -3900,13 +3898,16 @@ var DragDropContext = function (_React$Component) {
   };
 
   _proto.render = function render() {
-    return this.props.children;
+    return React.createElement(Provider, {
+      store: this.store,
+      context: this.storeContext
+    }, this.props.children);
   };
 
   return DragDropContext;
 }(React.Component);
 
-DragDropContext.childContextTypes = (_DragDropContext$chil = {}, _DragDropContext$chil[dimensionMarshalKey] = PropTypes.object.isRequired, _DragDropContext$chil[styleContextKey] = PropTypes.string.isRequired, _DragDropContext$chil[canLiftContextKey] = PropTypes.func.isRequired, _DragDropContext$chil);
+DragDropContext.childContextTypes = (_DragDropContext$chil = {}, _DragDropContext$chil[storeContextKey] = PropTypes.object, _DragDropContext$chil[dimensionMarshalKey] = PropTypes.object.isRequired, _DragDropContext$chil[styleContextKey] = PropTypes.string.isRequired, _DragDropContext$chil[canLiftContextKey] = PropTypes.func.isRequired, _DragDropContext$chil);
 
 var isScrollable = function isScrollable() {
   for (var _len = arguments.length, values = new Array(_len), _key = 0; _key < _len; _key++) {
@@ -4386,6 +4387,7 @@ var isStrictEqual = (function (a, b) {
   return a === b;
 });
 
+var _Droppable2$contextTy;
 var makeMapStateToProps = function makeMapStateToProps() {
   var getIsDraggingOver = function getIsDraggingOver(id, destination) {
     if (!destination) {
@@ -4453,12 +4455,35 @@ var makeMapStateToProps = function makeMapStateToProps() {
 
   return selector;
 };
-var connectedDroppable = connect(makeMapStateToProps, null, null, {
-  context: storeContext,
-  pure: true,
-  areStatePropsEqual: isStrictEqual
-})(Droppable);
-connectedDroppable.defaultProps = {
+
+var Droppable2 = function (_Component) {
+  _inheritsLoose(Droppable2, _Component);
+
+  function Droppable2(props, context) {
+    var _this;
+
+    _this = _Component.call(this, props, context) || this;
+    _this.storeContext = void 0;
+    _this.storeContext = context[storeContextKey];
+    return _this;
+  }
+
+  var _proto = Droppable2.prototype;
+
+  _proto.render = function render() {
+    var ConnectedDroppable = connect(makeMapStateToProps, null, null, {
+      context: this.storeContext,
+      pure: true,
+      areStatePropsEqual: isStrictEqual
+    })(Droppable);
+    return React.createElement(ConnectedDroppable, this.props);
+  };
+
+  return Droppable2;
+}(Component);
+
+Droppable2.contextTypes = (_Droppable2$contextTy = {}, _Droppable2$contextTy[storeContextKey] = PropTypes.object, _Droppable2$contextTy);
+Droppable2.defaultProps = {
   type: 'DEFAULT',
   isDropDisabled: false,
   direction: 'vertical',
@@ -6281,6 +6306,7 @@ var Draggable = function (_Component) {
 
 Draggable.contextTypes = (_Draggable$contextTyp = {}, _Draggable$contextTyp[droppableIdKey] = PropTypes.string.isRequired, _Draggable$contextTyp[droppableTypeKey] = PropTypes.string.isRequired, _Draggable$contextTyp[styleContextKey] = PropTypes.string.isRequired, _Draggable$contextTyp);
 
+var _Draggable2$contextTy;
 var defaultMapProps = {
   isDropAnimating: false,
   isDragging: false,
@@ -6421,14 +6447,37 @@ var mapDispatchToProps = {
   drop: drop,
   dropAnimationFinished: dropAnimationFinished
 };
-var ConnectedDraggable = connect(makeMapStateToProps$1, mapDispatchToProps, null, {
-  context: storeContext,
-  pure: true,
-  areStatePropsEqual: isStrictEqual
-})(Draggable);
-ConnectedDraggable.defaultProps = {
+
+var Draggable2 = function (_Component) {
+  _inheritsLoose(Draggable2, _Component);
+
+  function Draggable2(props, context) {
+    var _this;
+
+    _this = _Component.call(this, props, context) || this;
+    _this.storeContext = void 0;
+    _this.storeContext = context[storeContextKey];
+    return _this;
+  }
+
+  var _proto = Draggable2.prototype;
+
+  _proto.render = function render() {
+    var ConnectedDraggable = connect(makeMapStateToProps$1, mapDispatchToProps, null, {
+      context: this.storeContext,
+      pure: true,
+      areStatePropsEqual: isStrictEqual
+    })(Draggable);
+    return React.createElement(ConnectedDraggable, this.props);
+  };
+
+  return Draggable2;
+}(Component);
+
+Draggable2.contextTypes = (_Draggable2$contextTy = {}, _Draggable2$contextTy[storeContextKey] = PropTypes.object, _Draggable2$contextTy);
+Draggable2.defaultProps = {
   isDragDisabled: false,
   disableInteractiveElementBlocking: false
 };
 
-export { storeContext, DragDropContext, connectedDroppable as Droppable, ConnectedDraggable as Draggable, resetServerContext };
+export { storeContextKey, DragDropContext, Droppable2 as Droppable, Draggable2 as Draggable, resetServerContext };

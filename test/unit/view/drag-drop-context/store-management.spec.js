@@ -7,7 +7,7 @@ import { Provider, connect } from 'react-redux';
 import { createStore } from 'redux';
 import { Droppable, Draggable, DragDropContext } from '../../../../src';
 import type { DraggableProvided, DroppableProvided } from '../../../../src';
-import { storeContext, canLiftContextKey } from '../../../../src/view/context-keys';
+import { canLiftContextKey } from '../../../../src/view/context-keys';
 import App from './app';
 // Imported as wildcard so we can mock `resetStyleContext` using spyOn
 
@@ -71,6 +71,7 @@ describe('Playing with other redux apps', () => {
   it('should avoid clashes with parent redux applications', () => {
     class Container extends Component<*> {
       render() {
+        const storeContext = React.createContext(undefined);
         return (
           <Provider store={store} context={storeContext}>
             <DragDropContext onDragEnd={() => {}}>
